@@ -45,7 +45,7 @@ VARIABLE FIELD 1 CELLS ALLOT
    LOOP
    ." ┐"
    \ Bottom
-   2 FIELD @ 2 - TERM-MOVE-CURSOR-TO
+   2 FIELD @ TERM-MOVE-CURSOR-TO
    ." └"
    FIELD 1 CELLS + @ 2 - 2 DO
       ." ─"
