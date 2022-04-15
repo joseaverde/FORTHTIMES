@@ -35,7 +35,14 @@
 
 : FIXED-SQUARED FIXED-FLOAT FIXED-FLOAT * ;
 
-: ^ ( f e -- f^e )
+: !_ ( n -- n! )
+   1
+   SWAP 1+ 1 DO
+      I *
+   LOOP
+;
+
+: ^n ( f n -- f^n )
    DUP 0< IF
       -1 * RECURSE FIXED-SQUARED SWAP /
    ELSE DUP 0 = IF
@@ -53,9 +60,43 @@
    THEN THEN THEN
 ;
 
+: ^n/n! ( f n -- f^n/n! )
+   DUP 0= IF
+      DROP
+   ELSE
+      FIXED-FLOAT
+      SWAP 1+ 1 DO
+         OVER FIXED-FLOAT */ I /
+      LOOP
+      SWAP DROP
+   THEN
+;
+
 \ Radians go from -PI to PI
 : RADIANS ( f -- f )
    360 FIXED-FLOAT * MOD DUP
    PI 180 FIXED-FLOAT * */
    PI -
+;
+
+
+: SIN ( f -- sinf )
+   \ x - x³/3! + x⁵/5! - x⁷/7!
+   DUP >R
+   DUP 3 ^n/n! >R
+   DUP 5 ^n/n! >R
+   DUP 7 ^n/n! >R
+   R> R> - R> + R> -
+   SWAP DROP
+;
+
+: COS ( f -- cosf )
+   \ 1 - x²/2! + x⁴/4! - x⁶/6!
+   FIXED-FLOAT >R
+   DUP 2 ^n/n! >R
+   DUP 4 ^n/n! >R
+   DUP 6 ^n/n! >R
+   DUP 8 ^n/n! >R
+   R> R> - R> + R> - R> +
+   SWAP DROP
 ;

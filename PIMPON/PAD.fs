@@ -31,5 +31,52 @@
 \  (colour)
 \  (points)
 : PAD-SIZE 5 1- CELLS ;
+: PAD-LENGTH 3 ;
 
-: PAD.INITIALISE ;
+: PAD.INITIALISE ( pad-addr player colour -- )
+   SWAP >R
+   \ PAD.COLOUR = COLOUR
+   OVER 3 CELLS + !
+   R> 1 = IF
+      \ Player 1 : PAD.X = 1
+      DUP 1 CELLS + 2 FIXED-FLOAT * SWAP !
+   ELSE
+      \ Player 2 : PAD.X = PAD.WIDTH - 1
+      DUP 1 CELLS +
+      FIELD 1 CELLS + @ 2 - FIXED-FLOAT * SWAP !
+   THEN
+   \ PAD.Y = FIELD.HEIGHT/2 + 1
+   DUP 2 CELLS + FIELD @ 2 / 1 + FIXED-FLOAT * SWAP !
+   \ PAD.POINTS = 0
+   DUP 4 CELLS + 0 SWAP !
+   \ PAD.LENGTH = PAD-LENGTH
+   PAD-LENGTH SWAP !
+;
+
+
+: PAD.SHOW ( pad-addr -- )
+   TERM-BEGIN-FORMAT
+      OVER 3 CELLS + @ DUP TERM-FOR-BACKGROUND
+      SWAP TERM-FOR-FOREGROUND
+   TERM-END-FORMAT
+   DUP 1 CELLS + @ FIXED-FLOAT / SWAP
+   DUP 2 CELLS + @ FIXED-FLOAT / SWAP
+   @ 1 DO
+      2DUP I + TERM-MOVE-CURSOR-TO
+      ." █"
+   LOOP
+   TERM-CLEAR-FORMAT
+   2DROP
+;
+
+
+: PAD.MOVE ( amount pad-addr -- )
+   \ Clear
+   OVER 3 CELLS + @ >R
+   OVER 3 CELLS + 0 SWAP !
+   OVER PAD.SHOW
+   OVER 3 CELLS + R> SWAP !
+
+   SWAP 2 CELLS +
+   SWAP FIXED-FLOAT * SWAP +!
+;
